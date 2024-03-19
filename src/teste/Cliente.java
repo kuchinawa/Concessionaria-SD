@@ -14,6 +14,7 @@ public class Cliente {
         } catch (Exception e) {
             System.err.println("Cliente: " + e.toString());
             e.printStackTrace();
+
         }
     }
 }
