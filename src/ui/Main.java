@@ -1,13 +1,25 @@
 package ui;
 
-import data.VeiculoCRUD;
+import gateway.InterfaceGateway;
 import model.Veiculo;
 
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-        VeiculoCRUD veiculoCRUD = new VeiculoCRUD();
+    static InterfaceGateway stubGateway;
+    public static void main(String[] args) throws RemoteException {
+
+        try{
+            Registry registro = LocateRegistry.getRegistry("localhost", 5002);
+            stubGateway = (InterfaceGateway) registro.lookup("Gateway");
+        }catch (Exception e){
+
+        }
+
+
         Scanner scanner = new Scanner(System.in);
         boolean parar = false;
 
@@ -32,25 +44,25 @@ public class Main {
                     autenticacao();
                     break;
                 case 2:
-                    adicionarCarro(veiculoCRUD, scanner);
+                    adicionarCarro(stubGateway, scanner);
                     break;
                 case 3:
-                    apagarCarro(veiculoCRUD, scanner);
+                    apagarCarro(stubGateway, scanner);
                     break;
                 case 4:
-                    listarCarros( veiculoCRUD);
+                    listarCarros(stubGateway);
                     break;
                 case 5:
-                    pesquisarCarro( veiculoCRUD, scanner);
+                    pesquisarCarro(stubGateway, scanner);
                     break;
                 case 6:
-                    alterarAtributosCarros( veiculoCRUD, scanner);
+                    alterarAtributosCarros(stubGateway, scanner);
                     break;
                 case 7:
                     atualizarListagemCarros();
                     break;
                 case 8:
-                    exibirQuantidadeCarros( veiculoCRUD);
+                    exibirQuantidadeCarros(stubGateway);
                     break;
                 case 9:
                     comprarCarro();
@@ -69,7 +81,7 @@ public class Main {
     private static void autenticacao() {
     }
 
-    private static void adicionarCarro(VeiculoCRUD veiculoCRUD, Scanner scanner) {
+    private static void adicionarCarro(InterfaceGateway stubGateway, Scanner scanner) throws RemoteException {
         System.out.println("Adicionar carro:");
         System.out.print("Renavam: ");
         String renavam = scanner.next();
@@ -106,19 +118,19 @@ public class Main {
         double preco = scanner.nextDouble();
 
         Veiculo veiculo = new Veiculo(renavam, nome, categoria, anoFabricacao, preco);
-        veiculoCRUD.adicionarVeiculo(veiculo);
+        stubGateway.adicionarVeiculo(veiculo);
         System.out.println("Carro adicionado com sucesso!");
     }
 
-    private static void apagarCarro(VeiculoCRUD veiculoCRUD, Scanner scanner) {
+    private static void apagarCarro(InterfaceGateway stubGateway, Scanner scanner) throws RemoteException {
         System.out.println("Apagar carro:");
         System.out.print("Informe o renavam do carro que deseja remover: ");
         String valor = scanner.next();
 
         if (valor.matches("\\d+")) {
-            Veiculo veiculo = veiculoCRUD.buscarVeiculo(valor);
+            Veiculo veiculo = stubGateway.buscarVeiculo(valor);
             if (veiculo != null) {
-                veiculoCRUD.removerVeiculo(valor);
+                stubGateway.removerVeiculo(valor);
                 System.out.println("Carro removido com sucesso!");
             } else {
                 System.out.println("Carro não encontrado.");
@@ -128,17 +140,17 @@ public class Main {
         }
     }
 
-    private static void listarCarros(VeiculoCRUD veiculoCRUD) {
-        veiculoCRUD.listarVeiculos();
+    private static void listarCarros(InterfaceGateway stubGateway) throws RemoteException{
+        stubGateway.listarVeiculos();
     }
 
 
-    private static void pesquisarCarro(VeiculoCRUD veiculoCRUD, Scanner scanner) {
+    private static void pesquisarCarro(InterfaceGateway stubGateway, Scanner scanner) throws RemoteException {
         System.out.println("Pesquisar carro:");
         System.out.print("Informe o nome ou renavam do carro: ");
         String valor = scanner.next();
 
-        Veiculo veiculo = veiculoCRUD.buscarVeiculo(valor);
+        Veiculo veiculo = stubGateway.buscarVeiculo(valor);
         if (veiculo != null) {
             System.out.println("Carro encontrado: " + veiculo);
         } else {
@@ -146,11 +158,11 @@ public class Main {
         }
     }
 
-    private static void alterarAtributosCarros(VeiculoCRUD veiculoCRUD, Scanner scanner) {
+    private static void alterarAtributosCarros(InterfaceGateway stubGateway, Scanner scanner) throws RemoteException {
         System.out.println("Alterar atributos de carros:");
         System.out.print("Informe o renavam do carro que deseja atualizar: ");
         String renavam = scanner.next();
-        Veiculo veiculo = veiculoCRUD.buscarVeiculo(renavam);
+        Veiculo veiculo = stubGateway.buscarVeiculo(renavam);
         if (veiculo != null) {
             System.out.println("Informe os novos detalhes do carro:");
             System.out.print("Nome: ");
@@ -166,24 +178,24 @@ public class Main {
             veiculo.setCategoria(categoria);
             veiculo.setAnoFabricacao(anoFabricacao);
             veiculo.setPreco(preco);
-            veiculoCRUD.atualizarVeiculo(veiculo);
+            stubGateway.atualizarVeiculo(veiculo);
             System.out.println("Carro atualizado com sucesso!");
         } else {
             System.out.println("Carro não encontrado.");
         }
     }
 
-    private static void atualizarListagemCarros() {
+    private static void atualizarListagemCarros() throws RemoteException{
 
     }
 
-    private static void exibirQuantidadeCarros(VeiculoCRUD veiculoCRUD) {
-        int quantidade = veiculoCRUD.getVeiculos().size();
-        System.out.println("Quantidade de carros: " + quantidade);
+    private static void exibirQuantidadeCarros(InterfaceGateway stubGateway) throws RemoteException{
+        //int quantidade = stubGateway.getVeiculos().size();
+//System.out.println("Quantidade de carros: " + quantidade);
     }
 
 
-    private static void comprarCarro() {
+    private static void comprarCarro() throws RemoteException{
 
     }
 }

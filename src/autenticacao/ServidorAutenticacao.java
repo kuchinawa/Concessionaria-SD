@@ -3,10 +3,13 @@ package autenticacao;
 import model.Usuario;
 
 import java.io.*;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServidorAutenticacao {
+public class ServidorAutenticacao implements InterfaceAutenticacao{
     private Map<String, Usuario> usuarios;
     private final String arquivo = "usuarios.txt";
 
@@ -42,5 +45,19 @@ public class ServidorAutenticacao {
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Erro ao carregar dados do arquivo: " + e.getMessage());
         }
+    }
+
+    public static void main(String[] args) {
+        try {
+            ServidorAutenticacao servidor = new ServidorAutenticacao();
+            InterfaceAutenticacao RefServer = (InterfaceAutenticacao) UnicastRemoteObject.exportObject(servidor, 5000);
+            Registry registro = LocateRegistry.createRegistry(5000);
+            registro.bind("ServidorAutenticacao", RefServer);
+
+        }catch (Exception e) {
+            System.err.println("Servidor: " + e.toString());
+            e.printStackTrace();
+        }
+
     }
 }

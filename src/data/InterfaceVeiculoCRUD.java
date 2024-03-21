@@ -10,4 +10,5 @@ public interface InterfaceVeiculoCRUD extends Remote {
     public void removerVeiculo(String placa) throws RemoteException;
     public Veiculo buscarVeiculo(String placa) throws RemoteException;
     public void atualizarVeiculo(Veiculo veiculo) throws RemoteException;
+    public void listarVeiculos() throws RemoteException;
 }

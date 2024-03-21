@@ -3,6 +3,9 @@ package data;
 import model.Veiculo;
 
 import java.io.*;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,6 +66,19 @@ public class VeiculoCRUD implements InterfaceVeiculoCRUD{
             outputStream.writeObject(veiculos);
         } catch (IOException e) {
             System.out.println("Erro ao salvar dados no arquivo: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            VeiculoCRUD veiculoCRUD = new VeiculoCRUD();
+            InterfaceVeiculoCRUD RefServer = (InterfaceVeiculoCRUD) UnicastRemoteObject
+                    .exportObject(veiculoCRUD, 5001);
+            Registry registro = LocateRegistry.createRegistry(5001);
+            registro.bind("VeiculoCRUD", RefServer);
+        }catch (Exception e) {
+            System.err.println("Servidor: " + e.toString());
+            e.printStackTrace();
         }
     }
 }
