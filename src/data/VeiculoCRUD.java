@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class VeiculoCRUD {
+public class VeiculoCRUD implements InterfaceVeiculoCRUD{
     private Map<String, Veiculo> veiculos;
     private final String arquivo = "veiculos.txt";
     public VeiculoCRUD() {
@@ -27,7 +27,7 @@ public class VeiculoCRUD {
         salvarDados();
     }
 
-    public Veiculo obterVeiculo(String renavam) {
+    public Veiculo buscarVeiculo(String renavam) {
         return veiculos.get(renavam);
     }
     public Map<String, Veiculo> getVeiculos() {

@@ -25,7 +25,7 @@ public class Main {
             System.out.println("10 - Sair");
 
             int opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar o buffer
+            scanner.nextLine();
 
             switch (opcao) {
                 case 1:
@@ -74,7 +74,7 @@ public class Main {
         System.out.print("Renavam: ");
         String renavam = scanner.next();
         System.out.print("Nome: ");
-        String nome = scanner.next();
+        String nome = scanner.nextLine();
 
         System.out.println("Escolha a categoria do carro:");
         System.out.println("1 - Econômico");
@@ -116,7 +116,7 @@ public class Main {
         String valor = scanner.next();
 
         if (valor.matches("\\d+")) {
-            Veiculo veiculo = veiculoCRUD.obterVeiculo(valor);
+            Veiculo veiculo = veiculoCRUD.buscarVeiculo(valor);
             if (veiculo != null) {
                 veiculoCRUD.removerVeiculo(valor);
                 System.out.println("Carro removido com sucesso!");
@@ -138,7 +138,7 @@ public class Main {
         System.out.print("Informe o nome ou renavam do carro: ");
         String valor = scanner.next();
 
-        Veiculo veiculo = veiculoCRUD.obterVeiculo(valor);
+        Veiculo veiculo = veiculoCRUD.buscarVeiculo(valor);
         if (veiculo != null) {
             System.out.println("Carro encontrado: " + veiculo);
         } else {
@@ -150,7 +150,7 @@ public class Main {
         System.out.println("Alterar atributos de carros:");
         System.out.print("Informe o renavam do carro que deseja atualizar: ");
         String renavam = scanner.next();
-        Veiculo veiculo = veiculoCRUD.obterVeiculo(renavam);
+        Veiculo veiculo = veiculoCRUD.buscarVeiculo(renavam);
         if (veiculo != null) {
             System.out.println("Informe os novos detalhes do carro:");
             System.out.print("Nome: ");
