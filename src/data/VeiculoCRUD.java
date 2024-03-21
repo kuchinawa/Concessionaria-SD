@@ -70,8 +70,8 @@ public class VeiculoCRUD implements InterfaceVeiculoCRUD{
         try {
             VeiculoCRUD veiculoCRUD = new VeiculoCRUD();
             InterfaceVeiculoCRUD RefServer = (InterfaceVeiculoCRUD) UnicastRemoteObject
-                    .exportObject(veiculoCRUD, 5001);
-            Registry registro = LocateRegistry.createRegistry(5001);
+                    .exportObject(veiculoCRUD, 6001);
+            Registry registro = LocateRegistry.createRegistry(6001);
             registro.bind("VeiculoCRUD", RefServer);
         }catch (Exception e) {
             System.err.println("Servidor: " + e.toString());

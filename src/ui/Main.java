@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) throws RemoteException {
 
         try {
-            Registry registro = LocateRegistry.getRegistry("localhost", 5002);
+            Registry registro = LocateRegistry.getRegistry("localhost", 6002);
             stubGateway = (InterfaceGateway) registro.lookup("Gateway");
         } catch (Exception e) {
 
@@ -49,17 +49,18 @@ public class Main {
                     }
                     break;
                 case 2:
-                    if (!loggedIn && !isFuncionario) {
-                        System.out.println("Você precisa estar autenticado para adicionar um carro.");
-                    } else {
+                    if (isFuncionario) {
                         adicionarCarro(stubGateway, scanner);
+                    } else {
+                        System.out.println("Você precisa estar autenticado para adicionar um carro.");
+
                     }
                     break;
                 case 3:
-                    if (!loggedIn && !isFuncionario) {
-                        System.out.println("Você precisa estar autenticado para apagar um carro.");
-                    } else {
+                    if (isFuncionario) {
                         apagarCarro(stubGateway, scanner);
+                    } else {
+                        System.out.println("Você precisa estar autenticado para apagar um carro.");
                     }
                     break;
                 case 4:
@@ -69,10 +70,12 @@ public class Main {
                     pesquisarCarro(stubGateway, scanner);
                     break;
                 case 6:
-                    if (!loggedIn && !isFuncionario) {
-                        System.out.println("Você precisa estar autenticado para alterar atributos de carros.");
-                    } else {
+                    if (isFuncionario) {
                         alterarAtributosCarros(stubGateway, scanner);
+
+                    } else {
+                        System.out.println("Você precisa estar autenticado para alterar atributos de carros.");
+
                     }
                     break;
                 case 7:
@@ -248,16 +251,15 @@ public class Main {
     }
 
     private static void alterarAtributosCarros(InterfaceGateway stubGateway, Scanner scanner) throws RemoteException {
-        System.out.println("Alterar atributos de carros:");
-        System.out.print("Informe o renavam do carro que deseja atualizar: ");
-        String renavam = scanner.next();
+        System.out.println("alterar atributos de carros:");
+        System.out.print("informe o renavam do carro que deseja atualizar: ");
+        String renavam = scanner.nextLine();
         Veiculo veiculo = stubGateway.buscarVeiculo(renavam);
         if (veiculo != null) {
-            System.out.println("Informe os novos detalhes do carro:");
+            System.out.println("informe os novos detalhes do carro:");
             System.out.print("Nome: ");
-            String nome = scanner.next();
-
-            System.out.println("Escolha a nova categoria do carro:");
+            String nome = scanner.nextLine();
+            System.out.println("escolha a nova categoria do carro:");
             System.out.println("1 - Econômico");
             System.out.println("2 - Intermediário");
             System.out.println("3 - Executivo");
@@ -282,6 +284,7 @@ public class Main {
 
             System.out.print("Ano de fabricação: ");
             int anoFabricacao = scanner.nextInt();
+            scanner.nextLine();
             System.out.print("Preço: ");
             double preco = scanner.nextDouble();
 
@@ -308,7 +311,6 @@ public class Main {
         int quantidadeCarros = veiculos.size();
         System.out.println("Quantidade de carros: " + quantidadeCarros);
     }
-
 
 
     private static void comprarCarro(InterfaceGateway stubGateway, Scanner scanner) throws RemoteException {

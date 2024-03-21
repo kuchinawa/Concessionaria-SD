@@ -17,16 +17,16 @@ public class Gateway implements InterfaceGateway{
 
     public static void main(String[] args) {
         try {
-            Registry registro1 = LocateRegistry.getRegistry("localhost", 5000);
+            Registry registro1 = LocateRegistry.getRegistry("localhost", 6000);
             stubIntAut = (InterfaceAutenticacao) registro1.lookup("ServidorAutenticacao");
 
-            Registry registro2 = LocateRegistry.getRegistry("localhost", 5001);
+            Registry registro2 = LocateRegistry.getRegistry("localhost", 6001);
             stubVeiculoCRUD = (InterfaceVeiculoCRUD) registro2.lookup("VeiculoCRUD");
 
             Gateway refObjetoRemoto = new Gateway();
             InterfaceGateway RefServer = (InterfaceGateway) UnicastRemoteObject
-                    .exportObject(refObjetoRemoto, 5002);
-            Registry registro = LocateRegistry.createRegistry(5002);
+                    .exportObject(refObjetoRemoto, 6002);
+            Registry registro = LocateRegistry.createRegistry(6002);
             registro.bind("Gateway", RefServer);
 
 

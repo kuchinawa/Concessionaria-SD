@@ -63,8 +63,9 @@ public class ServidorAutenticacao implements InterfaceAutenticacao{
     public static void main(String[] args) {
         try {
             ServidorAutenticacao servidor = new ServidorAutenticacao();
-            InterfaceAutenticacao RefServer = (InterfaceAutenticacao) UnicastRemoteObject.exportObject(servidor, 5000);
-            Registry registro = LocateRegistry.createRegistry(5000);
+            InterfaceAutenticacao RefServer = (InterfaceAutenticacao) UnicastRemoteObject
+                    .exportObject(servidor, 6000);
+            Registry registro = LocateRegistry.createRegistry(6000);
             registro.bind("ServidorAutenticacao", RefServer);
 
         }catch (Exception e) {
