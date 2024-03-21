@@ -3,6 +3,7 @@ package autenticacao;
 import model.Usuario;
 
 import java.io.*;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -17,18 +18,30 @@ public class ServidorAutenticacao implements InterfaceAutenticacao{
 
     public ServidorAutenticacao() {
         usuarios = new HashMap<>();
-        carregarDados();
+        //carregarDados();
     }
 
-    public boolean autenticar(String login, String senha) {
-        Usuario usuario = usuarios.get(login);
-        return usuario != null && usuario.getSenha().equals(senha);
-    }
-
-    public void adicionarUsuario(Usuario usuario) {
-        usuarios.put(usuario.getLogin(), usuario);
+    @Override
+    public void adicionarUsuario(String login, String senha, String nome, String email, boolean funcionario) throws RemoteException {
+        Usuario usuario = new Usuario(login, senha, nome, email, funcionario);
+        usuarios.put(login, usuario);
         salvarDados();
     }
+
+    public int autenticar(String login, String senha) {
+        Usuario usuario = usuarios.get(login);
+        if(usuario != null && usuario.getSenha().equals(senha)){
+            if(usuario.isFuncionario()){
+                return 2;
+            } else {
+                return 1;
+            }
+        } else {
+            return 0;
+        }
+    }
+
+
     private void salvarDados() {
         try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(arquivo))) {
             outputStream.writeObject(usuarios);

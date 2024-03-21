@@ -2,13 +2,13 @@ package gateway;
 
 import autenticacao.InterfaceAutenticacao;
 import data.InterfaceVeiculoCRUD;
-import model.Usuario;
 import model.Veiculo;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Map;
 
 public class Gateway implements InterfaceGateway{
 
@@ -37,14 +37,14 @@ public class Gateway implements InterfaceGateway{
     }
 
     @Override
-    public boolean autenticar(String login, String senha) throws RemoteException {
-        boolean foi = stubIntAut.autenticar(login, senha);
+    public int autenticar(String login, String senha) throws RemoteException {
+        int foi = stubIntAut.autenticar(login, senha);
         return foi;
     }
 
     @Override
-    public void adicionarUsuario(Usuario usuario) throws RemoteException {
-        stubIntAut.adicionarUsuario(usuario);
+    public void adicionarUsuario(String login, String senha, String nome, String email, boolean funcionario) throws RemoteException {
+        stubIntAut.adicionarUsuario(login, senha, nome, email, funcionario);
     }
 
     @Override
@@ -70,7 +70,8 @@ public class Gateway implements InterfaceGateway{
     }
 
     @Override
-    public void listarVeiculos() throws RemoteException {
-        stubVeiculoCRUD.listarVeiculos();
+    public Map listarVeiculos() throws RemoteException {
+        Map lista = stubVeiculoCRUD.listarVeiculos();
+        return lista;
     }
 }

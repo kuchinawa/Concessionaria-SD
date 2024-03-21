@@ -18,11 +18,8 @@ public class VeiculoCRUD implements InterfaceVeiculoCRUD{
         carregarDados();
     }
 
-    public void listarVeiculos() {
-        System.out.println("~~~~ Lista de Veículos ~~~~");
-        for (Veiculo veiculo : veiculos.values()) {
-            System.out.println(veiculo);
-        }
+    public Map listarVeiculos() {
+        return veiculos;
     }
 
     public void adicionarVeiculo(Veiculo veiculo) {

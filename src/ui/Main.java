@@ -1,15 +1,19 @@
 package ui;
 
 import gateway.InterfaceGateway;
+import model.Usuario;
 import model.Veiculo;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
     static InterfaceGateway stubGateway;
+    static boolean loggedIn;
+    static boolean isFuncionario;
     public static void main(String[] args) throws RemoteException {
 
         try{
@@ -41,50 +45,116 @@ public class Main {
 
             switch (opcao) {
                 case 1:
-                    autenticacao();
+                    autenticacao(stubGateway, scanner);
                     break;
-                case 2:
-                    adicionarCarro(stubGateway, scanner);
-                    break;
-                case 3:
-                    apagarCarro(stubGateway, scanner);
-                    break;
-                case 4:
-                    listarCarros(stubGateway);
-                    break;
-                case 5:
-                    pesquisarCarro(stubGateway, scanner);
-                    break;
-                case 6:
-                    alterarAtributosCarros(stubGateway, scanner);
-                    break;
-                case 7:
-                    atualizarListagemCarros();
-                    break;
-                case 8:
-                    exibirQuantidadeCarros(stubGateway);
-                    break;
-                case 9:
-                    comprarCarro();
-                    break;
-                case 10:
-                    parar = true;
-                    break;
-                default:
-                    System.out.println("Opção inválida. Tente novamente.");
             }
+
+            if(loggedIn && Usuario.isFuncionario(){
+                switch (opcao){
+                    case 1:
+                        System.out.println("Você já está autenticado!");
+                        break;
+                    case 2:
+                        adicionarCarro(stubGateway, scanner);
+                        break;
+                    case 3:
+                        apagarCarro(stubGateway, scanner);
+                        break;
+                    case 4:
+                        listarCarros(stubGateway);
+                        break;
+                    case 5:
+                        pesquisarCarro(stubGateway, scanner);
+                        break;
+                    case 6:
+                        alterarAtributosCarros(stubGateway, scanner);
+                        break;
+                    case 7:
+                        atualizarListagemCarros();
+                        break;
+                    case 8:
+                        exibirQuantidadeCarros(stubGateway);
+                        break;
+                    case 9:
+                        comprarCarro();
+                        break;
+                    case 10:
+                        parar = true;
+                        break;
+                    default:
+                        System.out.println("Opção inválida. Tente novamente.");
+                }
+            }
+
         }
         System.out.println("Fim do programa.");
     }
 
 
-    private static void autenticacao() {
+    private static void autenticacao(InterfaceGateway stubGateway, Scanner scanner) throws RemoteException {
+        boolean loggedIn = false;
+        String usuarioLogado = null;
+
+        while (!loggedIn) {
+            System.out.println("\nOpções de Autenticação:");
+            System.out.println("1 - Criar conta de usuário");
+            System.out.println("2 - Fazer login");
+
+            int opcaoAutenticacao = scanner.nextInt();
+            scanner.nextLine(); // Limpar o buffer do scanner
+
+            switch (opcaoAutenticacao) {
+                case 1:
+                    criarContaUsuario(stubGateway, scanner);
+                    break;
+                case 2:
+                    System.out.print("Login: ");
+                    String login = scanner.nextLine();
+                    System.out.print("Senha: ");
+                    String senha = scanner.nextLine();
+
+                    if (stubGateway.autenticar(login, senha) == 1 || stubGateway.autenticar(login, senha) == 2) {
+                        loggedIn = true;
+                        usuarioLogado = login;
+                        if (stubGateway.autenticar(login, senha) == 2){
+                            isFuncionario = true;
+
+                        }
+
+                        System.out.println("Login bem-sucedido!");
+                    } else {
+                        System.out.println("Login ou senha inválidos. Tente novamente.");
+                    }
+                    break;
+                default:
+                    System.out.println("Opção inválida. Tente novamente.");
+            }
+        }
+
     }
+
+    private static void criarContaUsuario(InterfaceGateway stubGateway, Scanner scanner) throws RemoteException {
+        System.out.println("\nCriação de Conta de Usuário:");
+        System.out.print("Login: ");
+        String login = scanner.nextLine();
+        System.out.print("Senha: ");
+        String senha = scanner.nextLine();
+        System.out.print("Nome: ");
+        String nome = scanner.nextLine();
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+        System.out.print("É funcionário? (true/false): ");
+        boolean funcionario = scanner.nextBoolean();
+
+        stubGateway.adicionarUsuario(login, senha, nome, email, funcionario);
+        System.out.println("Conta de usuário criada com sucesso!");
+    }
+
 
     private static void adicionarCarro(InterfaceGateway stubGateway, Scanner scanner) throws RemoteException {
         System.out.println("Adicionar carro:");
         System.out.print("Renavam: ");
-        String renavam = scanner.next();
+        String renavam = scanner.nextLine();
         System.out.print("Nome: ");
         String nome = scanner.nextLine();
 
@@ -141,7 +211,11 @@ public class Main {
     }
 
     private static void listarCarros(InterfaceGateway stubGateway) throws RemoteException{
-        stubGateway.listarVeiculos();
+        Map lista = stubGateway.listarVeiculos();
+        System.out.println("~~~~ Lista de Veículos ~~~~");
+        for (Object veiculo : lista.values()) {
+            System.out.println(veiculo);
+        }
     }
 
 
@@ -167,8 +241,30 @@ public class Main {
             System.out.println("Informe os novos detalhes do carro:");
             System.out.print("Nome: ");
             String nome = scanner.next();
-            System.out.print("Categoria: ");
-            String categoria = scanner.next();
+
+            System.out.println("Escolha a nova categoria do carro:");
+            System.out.println("1 - Econômico");
+            System.out.println("2 - Intermediário");
+            System.out.println("3 - Executivo");
+
+            int opcaoCategoria = scanner.nextInt();
+
+            String categoria;
+            switch (opcaoCategoria) {
+                case 1:
+                    categoria = "Econômico";
+                    break;
+                case 2:
+                    categoria = "Intermediário";
+                    break;
+                case 3:
+                    categoria = "Executivo";
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+                    return;
+            }
+
             System.out.print("Ano de fabricação: ");
             int anoFabricacao = scanner.nextInt();
             System.out.print("Preço: ");
@@ -185,13 +281,14 @@ public class Main {
         }
     }
 
+
     private static void atualizarListagemCarros() throws RemoteException{
 
     }
 
     private static void exibirQuantidadeCarros(InterfaceGateway stubGateway) throws RemoteException{
         //int quantidade = stubGateway.getVeiculos().size();
-//System.out.println("Quantidade de carros: " + quantidade);
+        //System.out.println("Quantidade de carros: " + quantidade);
     }
 
 
