@@ -18,7 +18,7 @@ public class ServidorAutenticacao implements InterfaceAutenticacao{
 
     public ServidorAutenticacao() {
         usuarios = new HashMap<>();
-        //carregarDados();
+        carregarDados();
     }
 
     @Override
@@ -32,12 +32,12 @@ public class ServidorAutenticacao implements InterfaceAutenticacao{
         Usuario usuario = usuarios.get(login);
         if(usuario != null && usuario.getSenha().equals(senha)){
             if(usuario.isFuncionario()){
-                return 2;
+                return 2; // funcionario
             } else {
-                return 1;
+                return 1; // cliente
             }
         } else {
-            return 0;
+            return 0; // não autenticado
         }
     }
 

@@ -1,7 +1,6 @@
 package ui;
 
 import gateway.InterfaceGateway;
-import model.Usuario;
 import model.Veiculo;
 
 import java.rmi.RemoteException;
@@ -16,14 +15,12 @@ public class Main {
     static boolean isFuncionario;
     public static void main(String[] args) throws RemoteException {
 
-        try{
+        try {
             Registry registro = LocateRegistry.getRegistry("localhost", 5002);
             stubGateway = (InterfaceGateway) registro.lookup("Gateway");
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
-
-
         Scanner scanner = new Scanner(System.in);
         boolean parar = false;
 
@@ -45,63 +42,79 @@ public class Main {
 
             switch (opcao) {
                 case 1:
-                    autenticacao(stubGateway, scanner);
-                    break;
-            }
-
-            if(loggedIn && Usuario.isFuncionario(){
-                switch (opcao){
-                    case 1:
+                    if (loggedIn) {
                         System.out.println("Você já está autenticado!");
-                        break;
-                    case 2:
+                    } else {
+                        autenticacao(stubGateway, scanner);
+                    }
+                    break;
+                case 2:
+                    if (!loggedIn && !isFuncionario) {
+                        System.out.println("Você precisa estar autenticado para adicionar um carro.");
+                    } else {
                         adicionarCarro(stubGateway, scanner);
-                        break;
-                    case 3:
+                    }
+                    break;
+                case 3:
+                    if (!loggedIn && !isFuncionario) {
+                        System.out.println("Você precisa estar autenticado para apagar um carro.");
+                    } else {
                         apagarCarro(stubGateway, scanner);
-                        break;
-                    case 4:
-                        listarCarros(stubGateway);
-                        break;
-                    case 5:
-                        pesquisarCarro(stubGateway, scanner);
-                        break;
-                    case 6:
+                    }
+                    break;
+                case 4:
+                    listarCarros(stubGateway);
+                    break;
+                case 5:
+                    pesquisarCarro(stubGateway, scanner);
+                    break;
+                case 6:
+                    if (!loggedIn && !isFuncionario) {
+                        System.out.println("Você precisa estar autenticado para alterar atributos de carros.");
+                    } else {
                         alterarAtributosCarros(stubGateway, scanner);
-                        break;
-                    case 7:
+                    }
+                    break;
+                case 7:
+                    if (!loggedIn && !isFuncionario) {
+                        System.out.println("Você precisa estar autenticado para atualizar a listagem de carros.");
+                    } else {
                         atualizarListagemCarros();
-                        break;
-                    case 8:
-                        exibirQuantidadeCarros(stubGateway);
-                        break;
-                    case 9:
-                        comprarCarro();
-                        break;
-                    case 10:
-                        parar = true;
-                        break;
-                    default:
-                        System.out.println("Opção inválida. Tente novamente.");
-                }
+                    }
+                    break;
+                case 8:
+                    exibirQuantidadeCarros(stubGateway);
+                    break;
+                case 9:
+                    if (!loggedIn && !isFuncionario) {
+                        System.out.println("Você precisa estar autenticado para comprar um carro.");
+                    } else {
+                        comprarCarro(stubGateway, scanner);
+                    }
+                    break;
+                case 10:
+                    parar = true;
+                    break;
+                default:
+                    System.out.println("Opção inválida. Tente novamente.");
             }
-
         }
+
         System.out.println("Fim do programa.");
     }
 
 
     private static void autenticacao(InterfaceGateway stubGateway, Scanner scanner) throws RemoteException {
-        boolean loggedIn = false;
         String usuarioLogado = null;
 
         while (!loggedIn) {
             System.out.println("\nOpções de Autenticação:");
             System.out.println("1 - Criar conta de usuário");
             System.out.println("2 - Fazer login");
+            System.out.println("3 - Voltar");
 
             int opcaoAutenticacao = scanner.nextInt();
-            scanner.nextLine(); // Limpar o buffer do scanner
+            scanner.nextLine();
 
             switch (opcaoAutenticacao) {
                 case 1:
@@ -126,6 +139,8 @@ public class Main {
                         System.out.println("Login ou senha inválidos. Tente novamente.");
                     }
                     break;
+                case 3:
+                    return;
                 default:
                     System.out.println("Opção inválida. Tente novamente.");
             }
@@ -283,16 +298,39 @@ public class Main {
 
 
     private static void atualizarListagemCarros() throws RemoteException{
+        System.out.println("Faz nada, vou só imprimir os carros outra vez");
+        listarCarros(stubGateway);
 
     }
 
-    private static void exibirQuantidadeCarros(InterfaceGateway stubGateway) throws RemoteException{
-        //int quantidade = stubGateway.getVeiculos().size();
-        //System.out.println("Quantidade de carros: " + quantidade);
+    private static void exibirQuantidadeCarros(InterfaceGateway stubGateway) throws RemoteException {
+        Map<String, Veiculo> veiculos = stubGateway.listarVeiculos();
+        int quantidadeCarros = veiculos.size();
+        System.out.println("Quantidade de carros: " + quantidadeCarros);
     }
 
 
-    private static void comprarCarro() throws RemoteException{
 
+    private static void comprarCarro(InterfaceGateway stubGateway, Scanner scanner) throws RemoteException {
+        if (!loggedIn) {
+            System.out.println("Você precisa estar autenticado para comprar um carro.");
+            return;
+        }
+
+        System.out.print("Informe o renavam do carro que deseja comprar: ");
+        String renavam = scanner.next();
+
+        Veiculo veiculo = stubGateway.buscarVeiculo(renavam);
+        if (veiculo != null) {
+            if (loggedIn || isFuncionario) {
+                stubGateway.removerVeiculo(renavam);
+                System.out.println("Carro comprado com sucesso!");
+            } else {
+                System.out.println("Você não tem permissão para comprar um carro.");
+            }
+        } else {
+            System.out.println("Carro não encontrado.");
+        }
     }
+
 }
